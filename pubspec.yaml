@@ -1,8 +1,8 @@
 name: disk_space
-description: A new flutter plugin project.
+description: A tiny Flutter Plugin to show free and total disk space.
 version: 0.0.1
-author:
-homepage:
+author: Marvin Knabe <info@appgewaltig.de>
+homepage: https://appgewaltig.de
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
