@@ -1,23 +1,28 @@
-package de.appgewaltig.disk_space
+package de.appgewaltig.dsik_space
 
-import android.os.Environment
-import android.os.StatFs
+import androidx.annotation.NonNull
+
+import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.Registrar
 
-class DiskSpacePlugin: MethodCallHandler {
-  companion object {
-    @JvmStatic
-    fun registerWith(registrar: Registrar) {
-      val channel = MethodChannel(registrar.messenger(), "disk_space")
-      channel.setMethodCallHandler(DiskSpacePlugin())
-    }
+/** DiskSpacePlugin */
+class DiskSpacePlugin: FlutterPlugin, MethodCallHandler {
+  /// The MethodChannel that will the communication between Flutter and native Android
+  ///
+  /// This local reference serves to register the plugin with the Flutter Engine and unregister it
+  /// when the Flutter Engine is detached from the Activity
+  private lateinit var channel : MethodChannel
+
+  override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+    channel = MethodChannel(flutterPluginBinding.binaryMessenger, "disk_space")
+    channel.setMethodCallHandler(this)
   }
 
-  private fun getFreeDiskSpace(): Double {
+    private fun getFreeDiskSpace(): Double {
     val stat = StatFs(Environment.getExternalStorageDirectory().path)
 
     var bytesAvailable: Long
@@ -48,5 +53,9 @@ class DiskSpacePlugin: MethodCallHandler {
       "getTotalDiskSpace" -> result.success(getTotalDiskSpace())
       else -> result.notImplemented()
     }
+  }
+
+  override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
+    channel.setMethodCallHandler(null)
   }
 }
