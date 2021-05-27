@@ -1,3 +1,7 @@
+## 0.1.1
+
+- Updated Kotlin Version
+
 ## 0.1.0+2
 
 - Updated example
