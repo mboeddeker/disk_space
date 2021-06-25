@@ -1,54 +1,32 @@
 package de.appgewaltig.disk_space
 
-import android.os.Environment
-import android.os.StatFs
 import io.flutter.embedding.engine.plugins.FlutterPlugin
-import io.flutter.plugin.common.MethodCall
+import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodChannel
-import io.flutter.plugin.common.MethodChannel.MethodCallHandler
-import io.flutter.plugin.common.MethodChannel.Result
+import io.flutter.plugin.common.PluginRegistry
 
-class DiskSpacePlugin: FlutterPlugin, MethodCallHandler {
+class DiskSpacePlugin: FlutterPlugin {
 
-  private var channel : MethodChannel? = null
+  companion object {
+    private var channel: MethodChannel? = null
+    private var handler: MethodHandlerImpl = MethodHandlerImpl()
+
+    @JvmStatic
+    fun registerWith(registrar: PluginRegistry.Registrar) {
+      registerChannel(registrar.messenger())
+    }
+
+    private fun registerChannel(messenger: BinaryMessenger) {
+      channel = MethodChannel(messenger, "disk_space")
+      channel!!.setMethodCallHandler(handler)
+    }
+  }
 
   override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
-    channel = MethodChannel(binding.binaryMessenger, "disk_space")
-    channel!!.setMethodCallHandler(this)
+    registerChannel(binding.binaryMessenger)
   }
 
   override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
     channel = null
-  }
-
-  private fun getFreeDiskSpace(): Double {
-    val stat = StatFs(Environment.getExternalStorageDirectory().path)
-
-    val bytesAvailable: Long
-    bytesAvailable = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2)
-      stat.blockSizeLong * stat.availableBlocksLong
-    else
-      stat.blockSize.toLong() * stat.availableBlocks.toLong()
-    return (bytesAvailable / (1024f * 1024f)).toDouble()
-  }
-
-  private fun getTotalDiskSpace(): Double {
-    val stat = StatFs(Environment.getExternalStorageDirectory().path)
-
-    val bytesAvailable: Long
-    bytesAvailable = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2)
-      stat.blockSizeLong * stat.blockCountLong
-    else
-      stat.blockSize.toLong() * stat.blockCount.toLong()
-    return (bytesAvailable / (1024f * 1024f)).toDouble()
-  }
-
-
-  override fun onMethodCall(call: MethodCall, result: Result) {
-    when(call.method) {
-      "getFreeDiskSpace" -> result.success(getFreeDiskSpace())
-      "getTotalDiskSpace" -> result.success(getTotalDiskSpace())
-      else -> result.notImplemented()
-    }
   }
 }
