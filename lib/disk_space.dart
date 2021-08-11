@@ -20,4 +20,9 @@ class DiskSpace {
     final double? totalDiskSpace = await _channel.invokeMethod('getTotalDiskSpace');
     return totalDiskSpace;
   }
+
+  static Future<double?> getFreeDiskSpaceForPath(String path) async {
+    final double? freeDiskSpace = await _channel.invokeMethod('getFreeDiskSpaceForPath', {"path":path});
+    return freeDiskSpace;
+  }
 }

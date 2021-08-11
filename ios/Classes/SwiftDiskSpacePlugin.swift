@@ -14,6 +14,8 @@ public class SwiftDiskSpacePlugin: NSObject, FlutterPlugin {
         result(UIDevice.current.freeDiskSpaceInMB)
     case "getTotalDiskSpace":
         result(UIDevice.current.totalDiskSpaceInMB)
+    case "getFreeDiskSpaceForPath":
+        result(UIDevice.current.freeDiskSpaceForPathInMB(path: (call.arguments as? [String: String])!["path"]!))
     default:
         result(0.0)
     }
@@ -34,6 +36,12 @@ extension UIDevice {
     var usedDiskSpaceInMB:Double {
         return Double(usedDiskSpaceInBytes / (1024 * 1024))
     }
+    
+    public func freeDiskSpaceForPathInMB(path: String) -> Double {
+        return Double(freeDiskSpaceForPathInBytes(path: path) / (1024 * 1024))
+    }
+    
+    
 
     //MARK: Get raw value
     var totalDiskSpaceInBytes:Int64 {
@@ -66,6 +74,24 @@ extension UIDevice {
 
     var usedDiskSpaceInBytes:Int64 {
        return totalDiskSpaceInBytes - freeDiskSpaceInBytes
+    }
+    
+    public func freeDiskSpaceForPathInBytes(path: String) -> Int64 {
+        if #available(iOS 11.0, *) {
+            if let space = try? URL(fileURLWithPath: path).resourceValues(forKeys: [URLResourceKey.volumeAvailableCapacityForImportantUsageKey]).volumeAvailableCapacityForImportantUsage {
+                return space ?? 0
+            } else {
+                return 0
+            }
+        } else {
+            if let systemAttributes = try? FileManager.default.attributesOfFileSystem(forPath: path),
+            let freeSpace = (systemAttributes[FileAttributeKey.systemFreeSize] as? NSNumber)?.int64Value {
+                return freeSpace
+            } else {
+                return 0
+            }
+        }
+        
     }
 
 }
