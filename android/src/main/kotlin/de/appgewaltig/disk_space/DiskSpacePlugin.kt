@@ -1,52 +1,32 @@
 package de.appgewaltig.disk_space
 
-import android.os.Environment
-import android.os.StatFs
-import io.flutter.plugin.common.MethodCall
+import io.flutter.embedding.engine.plugins.FlutterPlugin
+import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodChannel
-import io.flutter.plugin.common.MethodChannel.MethodCallHandler
-import io.flutter.plugin.common.MethodChannel.Result
-import io.flutter.plugin.common.PluginRegistry.Registrar
+import io.flutter.plugin.common.PluginRegistry
 
-class DiskSpacePlugin: MethodCallHandler {
+class DiskSpacePlugin: FlutterPlugin {
+
   companion object {
+    private var channel: MethodChannel? = null
+    private var handler: MethodHandlerImpl = MethodHandlerImpl()
+
     @JvmStatic
-    fun registerWith(registrar: Registrar) {
-      val channel = MethodChannel(registrar.messenger(), "disk_space")
-      channel.setMethodCallHandler(DiskSpacePlugin())
+    fun registerWith(registrar: PluginRegistry.Registrar) {
+      registerChannel(registrar.messenger())
+    }
+
+    private fun registerChannel(messenger: BinaryMessenger) {
+      channel = MethodChannel(messenger, "disk_space")
+      channel!!.setMethodCallHandler(handler)
     }
   }
 
-  private fun getFreeDiskSpace(): Double {
-    val stat = StatFs(Environment.getExternalStorageDirectory().path)
-
-    var bytesAvailable: Long
-
-    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2)
-      bytesAvailable = stat.blockSizeLong * stat.availableBlocksLong
-    else
-      bytesAvailable = stat.blockSize.toLong() * stat.availableBlocks.toLong()
-    return (bytesAvailable / (1024f * 1024f)).toDouble()
+  override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+    registerChannel(binding.binaryMessenger)
   }
 
-  private fun getTotalDiskSpace(): Double {
-    val stat = StatFs(Environment.getExternalStorageDirectory().path)
-
-    var bytesAvailable: Long
-
-    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2)
-      bytesAvailable = stat.blockSizeLong * stat.blockCountLong
-    else
-      bytesAvailable = stat.blockSize.toLong() * stat.blockCount.toLong()
-    return (bytesAvailable / (1024f * 1024f)).toDouble()
-  }
-
-
-  override fun onMethodCall(call: MethodCall, result: Result) {
-    when(call.method) {
-      "getFreeDiskSpace" -> result.success(getFreeDiskSpace())
-      "getTotalDiskSpace" -> result.success(getTotalDiskSpace())
-      else -> result.notImplemented()
-    }
+  override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+    channel = null
   }
 }
