@@ -26,6 +26,8 @@ apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
+    namespace 'de.appgewaltig.disk_space_example'
+
     compileSdkVersion 30
 
     sourceSets {
