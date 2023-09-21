@@ -2,7 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/android.iml" filepath="$PROJECT_DIR$/.idea/modules/android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/disk_space.iml" filepath="$PROJECT_DIR$/.idea/modules/disk_space.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/disk_space.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/disk_space.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/disk_space.main.iml" filepath="$PROJECT_DIR$/.idea/modules/disk_space.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/disk_space.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/disk_space.unitTest.iml" />
     </modules>
   </component>
 </project>
