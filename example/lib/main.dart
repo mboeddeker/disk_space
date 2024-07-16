@@ -24,8 +24,8 @@ class _MyAppState extends State<MyApp> {
     initDiskSpace();
   }
 
-  Future<void> initDiskSpace() async {
-    double diskSpace = 0;
+  initDiskSpace() async {
+    double? diskSpace = 0;
 
     diskSpace = await DiskSpace.getFreeDiskSpace;
 
@@ -46,13 +46,13 @@ class _MyAppState extends State<MyApp> {
 
     for (var directory in directories) {
       var space = await DiskSpace.getFreeDiskSpaceForPath(directory.path);
-      directorySpace.addEntries([MapEntry(directory, space)]);
+      directorySpace.addEntries([MapEntry(directory, space!)]);
     }
 
     if (!mounted) return;
 
     setState(() {
-      _diskSpace = diskSpace;
+      _diskSpace = diskSpace!;
       _directorySpace = directorySpace;
     });
   }
